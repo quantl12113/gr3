@@ -127,8 +127,8 @@ netG.eval()
 #netS.apply(weights_init)
 netS.load_state_dict(torch.load('./pretrained_models/SMaps_Best.pth', map_location='cpu'))
 #netS.eval()
-netS.cuda()
-netG.cuda()
+netS.cpu()
+netG.cpu()
 
 # Initialize testing data
 target= torch.FloatTensor(opt.batchSize, outputChannelSize, opt.imageSize, opt.imageSize)
@@ -161,25 +161,25 @@ val_input_128 = torch.FloatTensor(opt.batchSize, inputChannelSize, (opt.imageSiz
 val_target_256= torch.FloatTensor(opt.batchSize, outputChannelSize, (opt.imageSize//2), (opt.imageSize//2))
 val_input_256 = torch.FloatTensor(opt.batchSize, inputChannelSize, (opt.imageSize//2), (opt.imageSize//2))
 
-target, input, depth, ato = target.cuda(), input.cuda(), depth.cuda(), ato.cuda()
-val_target, val_input, val_depth, val_ato = val_target.cuda(), val_input.cuda(), val_depth.cuda(), val_ato.cuda()
+target, input, depth, ato = target.cpu(), input.cpu(), depth.cpu(), ato.cpu()
+val_target, val_input, val_depth, val_ato = val_target.cpu(), val_input.cpu(), val_depth.cpu(), val_ato.cpu()
 
 target = Variable(target, volatile=True)
 input = Variable(input,volatile=True)
 depth = Variable(depth,volatile=True)
 ato = Variable(ato,volatile=True)
 
-target_128, input_128 = target_128.cuda(), input_128.cuda()
-val_target_128, val_input_128 = val_target_128.cuda(), val_input_128.cuda()
-target_256, input_256 = target_256.cuda(), input_256.cuda()
-val_target_256, val_input_256 = val_target_256.cuda(), val_input_256.cuda()
+target_128, input_128 = target_128.cpu(), input_128.cpu()
+val_target_128, val_input_128 = val_target_128.cpu(), val_input_128.cpu()
+target_256, input_256 = target_256.cpu(), input_256.cpu()
+val_target_256, val_input_256 = val_target_256.cpu(), val_input_256.cpu()
 
 target_128 = Variable(target_128)
 input_128 = Variable(input_128)
 target_256 = Variable(target_256)
 input_256 = Variable(input_256)
 
-label_d = Variable(label_d.cuda())
+label_d = Variable(label_d.cpu())
 
 
 
@@ -216,7 +216,7 @@ for epoch in range(1):
 
       val_input_cpu, val_target_cpu = data_val
 
-      val_target_cpu, val_input_cpu = val_target_cpu.float().cuda(), val_input_cpu.float().cuda()
+      val_target_cpu, val_input_cpu = val_target_cpu.float().cpu(), val_input_cpu.float().cpu()
       val_batch_output = torch.FloatTensor(val_input.size()).fill_(0)
 
       val_input.resize_as_(val_input_cpu).copy_(val_input_cpu)
@@ -277,14 +277,14 @@ for epoch in range(1):
             class_msk4[:,0,:,:] = smaps[:,3,:,:]  
             class_msk4[:,1,:,:] = smaps[:,3,:,:]
             class_msk4[:,2,:,:] = smaps[:,3,:,:]
-            class1 = class1.float().cuda()
-            class2 = class2.float().cuda()
-            class3 = class3.float().cuda()
-            class4 = class4.float().cuda()
-            class_msk4 = class_msk4.float().cuda()
-            class_msk3 = class_msk3.float().cuda()
-            class_msk2 = class_msk2.float().cuda()
-            class_msk1 = class_msk1.float().cuda()
+            class1 = class1.float().cpu()
+            class2 = class2.float().cpu()
+            class3 = class3.float().cpu()
+            class4 = class4.float().cpu()
+            class_msk4 = class_msk4.float().cpu()
+            class_msk3 = class_msk3.float().cpu()
+            class_msk2 = class_msk2.float().cpu()
+            class_msk1 = class_msk1.float().cpu()
             x_hat_val, x_hat_val64,xmask1,xmask2,xmask3,xmask4,xcl_class1,xcl_class2,xcl_class3,xcl_class4 = netG(val_inputv,val_inputv_256,smaps,class1,class2,class3,class4,val_inputv,class_msk1,class_msk2,class_msk3,class_msk4)
             # x_hat1,x_hat64,xmask1,xmask2,xmask3,xmask4,xcl_class1,xcl_class2,xcl_class3,xcl_class4 = netG(input,input_256,smaps_i,class1,class2,class3,class4,target,class_msk1,class_msk2,class_msk3,class_msk4)
             #x_hat_val.data
